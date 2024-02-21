@@ -1,37 +1,30 @@
-import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { Button } from "react-native";
+import HomeScreenStack from "./pages/homeScreen/homeScreenStack";
+import ListScreenStack from "./pages/listScreen/listScreenStack";
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-    const [displayText, setDisplayText] = useState(false);
-    const onPress = () => {
-        setDisplayText(!displayText);
-    };
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>Test text 123</Text>
-            <Pressable onPress={onPress}>
-                <Text>Test gumb</Text>
-            </Pressable>
-            {displayText && (
-                <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut.duration(500)}>
-                    <Text>Test display text</Text>
-                </Animated.View>
-            )}
-        </View>
+        <NavigationContainer>
+            <Tab.Navigator>
+                <Tab.Screen
+                    name="Home"
+                    component={HomeScreenStack}
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+                <Tab.Screen
+                    name="List"
+                    component={ListScreenStack}
+                    options={{
+                        headerShown: false,
+                        headerRight: () => <Button title="Add" color="#00cc00" />,
+                    }}
+                />
+            </Tab.Navigator>
+        </NavigationContainer>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    text: {
-        fontWeight: "500",
-        fontSize: 20,
-        paddingLeft: "20%",
-    },
-});

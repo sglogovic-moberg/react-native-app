@@ -1,0 +1,124 @@
+import React, { useState } from "react";
+import { Pressable, Text, View, StyleSheet, Button, ScrollView, ImageBackground, Dimensions } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { IWateredPlantInfo, usePlantListStore } from "../../store/plantListStore";
+import BasePlantTile from "../../components/plantTile/basePlantTile";
+
+const gap = 12;
+
+const createRows = (data: any[], columns: number) => {
+    let rows = [];
+    for (let i = 0; i < data.length; i += columns) {
+        // Extract a slice of 'columns' items and add to the rows array
+        rows.push(data.slice(i, i + columns));
+    }
+    return rows;
+};
+
+const HomeScreen = (props: any) => {
+    const plants = usePlantListStore(state => state.plants);
+    const clearPlants = usePlantListStore(state => state.clearPlants);
+    const wateredPlants = usePlantListStore(state => state.wateredPlants);
+
+    const [displayText, setDisplayText] = useState(false);
+
+    const onPress = () => {
+        setDisplayText(!displayText);
+    };
+
+    const rows = createRows(plants, 2);
+
+    return (
+        <View style={styles.container}>
+            <ScrollView style={styles.list}>
+                <ImageBackground
+                    source={require("../../components/icons/svgtopng/plantsHomeImage.png")}
+                    resizeMode="cover"
+                    style={styles.image}
+                    height={200}
+                >
+                    <Text style={styles.headerText}>PLANTZZZ</Text>
+                    <Text style={styles.headerSubtitle}>My plants</Text>
+                </ImageBackground>
+                <View style={{ padding: 16 }}>
+                    {rows.map((row: any, rowIndex: number) => (
+                        <View key={rowIndex} style={styles.row}>
+                            {row.map((plant: any, index: number) => {
+                                if (!plant) {
+                                    return null;
+                                }
+
+                                const wateredPlant = wateredPlants.find(
+                                    (wateredPlant: IWateredPlantInfo) => wateredPlant.plantId === plant.id
+                                );
+
+                                return (
+                                    <BasePlantTile
+                                        plant={plant}
+                                        wateredPlant={wateredPlant}
+                                        navigation={props.navigation}
+                                        key={plant.id}
+                                    />
+                                );
+                            })}
+                        </View>
+                    ))}
+                </View>
+            </ScrollView>
+            <Button title="Go to Details" onPress={() => clearPlants()} />
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#EFFFF0",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    text: {
+        fontWeight: "500",
+        fontSize: 20,
+        paddingLeft: "20%",
+    },
+    list: {
+        width: "100%",
+    },
+    headerText: {
+        fontSize: 30,
+        fontWeight: "bold",
+        marginTop: 40,
+        marginBottom: 16,
+        color: "white",
+        textAlign: "center",
+    },
+    headerSubtitle: {
+        fontSize: 18,
+        marginBottom: 10,
+        textAlign: "left",
+        width: "100%",
+        fontWeight: "bold",
+        color: "white",
+        padding: 24,
+        paddingBottom: 8,
+    },
+    image: {
+        height: 200,
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 10,
+    },
+    box: {
+        width: "48%",
+        height: 100,
+        backgroundColor: "lightgrey",
+    },
+});
+
+export default HomeScreen;
