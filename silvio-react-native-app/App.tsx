@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import { Button } from "react-native";
+import { Button, View, Image } from "react-native";
 import HomeScreenStack from "./pages/homeScreen/homeScreenStack";
 import ListScreenStack from "./pages/listScreen/listScreenStack";
 const Tab = createBottomTabNavigator();
@@ -14,6 +14,9 @@ export default function App() {
                     component={HomeScreenStack}
                     options={{
                         headerShown: false,
+                        tabBarIcon: ({ color, size }) => (
+                            <Image source={require("./components/icons/svgtopng/home.png")} height={16} width={16} />
+                        ),
                     }}
                 />
                 <Tab.Screen
@@ -22,6 +25,9 @@ export default function App() {
                     options={{
                         headerShown: false,
                         headerRight: () => <Button title="Add" color="#00cc00" />,
+                        tabBarIcon: ({ color, size }) => (
+                            <Image source={require("./components/icons/svgtopng/search.png")} height={16} width={16} />
+                        ),
                     }}
                 />
             </Tab.Navigator>

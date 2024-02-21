@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
 
         elevation: 5,
+        marginVertical: 0,
     },
     touchable1: {
         height: "100%",
@@ -121,16 +122,17 @@ const styles = StyleSheet.create({
     },
     watered: {
         backgroundColor: "#99C8FF",
-        padding: 4,
+        padding: 8,
         borderRadius: 8,
         fontSize: 12,
     },
     notWatered: {
         fontSize: 12,
+        paddin: 8,
     },
     needsWatering: {
         backgroundColor: "#FF7373",
-        padding: 4,
+        padding: 8,
         borderRadius: 8,
         fontSize: 12,
     },
@@ -148,7 +150,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly",
 
         height: 48,
-        width: 125,
+        width: childWidth,
+        elevation: 5,
     },
     waterButtonContainer: {
         width: "100%",

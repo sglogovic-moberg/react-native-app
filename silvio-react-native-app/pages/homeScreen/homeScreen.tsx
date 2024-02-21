@@ -33,44 +33,53 @@ const HomeScreen = (props: any) => {
             <ScrollView style={styles.list}>
                 <ImageBackground
                     source={require("../../components/icons/svgtopng/plantsHomeImage.png")}
-                    resizeMode="cover"
-                    style={styles.image}
-                    height={200}
+                    style={styles.screenWrapper}
+                    imageStyle={styles.backgroundStyle}
                 >
                     <Text style={styles.headerText}>PLANTZZZ</Text>
                     <Text style={styles.headerSubtitle}>My plants</Text>
+                    <View style={{ padding: 16 }}>
+                        {rows.map((row: any, rowIndex: number) => (
+                            <View key={rowIndex} style={styles.row}>
+                                {row.map((plant: any, index: number) => {
+                                    if (!plant) {
+                                        return null;
+                                    }
+
+                                    const wateredPlant = wateredPlants.find(
+                                        (wateredPlant: IWateredPlantInfo) => wateredPlant.plantId === plant.id
+                                    );
+
+                                    return (
+                                        <BasePlantTile
+                                            plant={plant}
+                                            wateredPlant={wateredPlant}
+                                            navigation={props.navigation}
+                                            key={plant.id}
+                                        />
+                                    );
+                                })}
+                            </View>
+                        ))}
+                    </View>
                 </ImageBackground>
-                <View style={{ padding: 16 }}>
-                    {rows.map((row: any, rowIndex: number) => (
-                        <View key={rowIndex} style={styles.row}>
-                            {row.map((plant: any, index: number) => {
-                                if (!plant) {
-                                    return null;
-                                }
-
-                                const wateredPlant = wateredPlants.find(
-                                    (wateredPlant: IWateredPlantInfo) => wateredPlant.plantId === plant.id
-                                );
-
-                                return (
-                                    <BasePlantTile
-                                        plant={plant}
-                                        wateredPlant={wateredPlant}
-                                        navigation={props.navigation}
-                                        key={plant.id}
-                                    />
-                                );
-                            })}
-                        </View>
-                    ))}
-                </View>
             </ScrollView>
-            <Button title="Go to Details" onPress={() => clearPlants()} />
+            {/* <Button title="Go to Details" onPress={() => clearPlants()} /> */}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    screenWrapper: {
+        flex: 1,
+        position: "relative",
+    },
+    backgroundStyle: {
+        resizeMode: "cover",
+        position: "absolute",
+        top: 0,
+        bottom: "80%",
+    },
     container: {
         flex: 1,
         backgroundColor: "#EFFFF0",
@@ -104,15 +113,15 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
     },
     image: {
-        height: 200,
         width: "100%",
-        justifyContent: "center",
-        alignItems: "center",
+        backgroundColor: "#000",
+        padding: 20,
+        paddingVertical: 40,
     },
     row: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 10,
+        marginBottom: 32,
     },
     box: {
         width: "48%",

@@ -17,6 +17,7 @@ import { usePlantListStore } from "../../store/plantListStore";
 import Spinner from "react-native-loading-spinner-overlay";
 import { apiKey } from "../../utils/constants";
 import { initialListCache } from "./listScreen.cache";
+import ListPlantTile from "../../components/plantTile/listPlantTile";
 
 interface IPageResult {
     to: number;
@@ -70,7 +71,7 @@ const ListScreen = (props: any) => {
     }, []);
 
     const searchOptions = async (value: string) => {
-        setLoading(true);
+        // setLoading(true);
         const result: any = await axios.get(`https://perenual.com/api/species-list?key=${apiKey}&q=${value}`);
         setPageResult({
             to: result.data.to,
@@ -81,7 +82,7 @@ const ListScreen = (props: any) => {
             total: result.data.total,
         });
         setResults(result.data.data);
-        setLoading(false);
+        // setLoading(false);
 
         scrollRef.current?.scrollTo({
             y: 0,
@@ -140,8 +141,17 @@ const ListScreen = (props: any) => {
     return (
         <SafeAreaView>
             <Spinner visible={loading} textContent={"Loading..."} />
-            <Text>Search plants</Text>
-            <TextInput style={styles.input} onChangeText={onChangeText} value={text} />
+            <View style={styles.searchSection}>
+                <TextInput
+                    style={styles.input}
+                    onChangeText={onChangeText}
+                    value={text}
+                    underlineColorAndroid="transparent"
+                    placeholder="Search"
+                />
+                <Image style={styles.searchIcon} source={require("../../components/icons/svgtopng/search.png")} />
+            </View>
+
             <ScrollView
                 onScroll={({ nativeEvent }) => {
                     if (isCloseToBottom(nativeEvent)) {
@@ -153,37 +163,37 @@ const ListScreen = (props: any) => {
                 // @ts-ignore
                 ref={scrollRef}
             >
-                <Text>Results</Text>
                 {results.map((result: any, index) => {
                     const hasImage = result.default_image?.thumbnail ? true : false;
                     return (
-                        <>
-                            <TouchableOpacity
-                                onPress={() => props.navigation.navigate("Details", { screen: "List", id: result.id })}
-                                key={result.id}
-                            >
-                                <Text>
-                                    {result.common_name} - {result.cycle} - {result.watering} -{" "}
-                                    {JSON.stringify(result.sunlight)}
-                                </Text>
-                                {hasImage && (
-                                    <Image
-                                        source={{
-                                            uri: result.default_image.thumbnail,
-                                        }}
-                                        style={{ width: 50, height: 50 }}
-                                    />
-                                )}
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                                <Button
-                                    title="+"
-                                    onPress={() => {
-                                        addPlant(result);
-                                    }}
-                                />
-                            </TouchableOpacity>
-                        </>
+                        <ListPlantTile navigation={props.navigation} plant={result} />
+                        // <>
+                        //     <TouchableOpacity
+                        //         onPress={() => props.navigation.navigate("Details", { screen: "List", id: result.id })}
+                        //         key={result.id}
+                        //     >
+                        //         <Text>
+                        //             {result.common_name} - {result.cycle} - {result.watering} -{" "}
+                        //             {JSON.stringify(result.sunlight)}
+                        //         </Text>
+                        //         {hasImage && (
+                        //             <Image
+                        //                 source={{
+                        //                     uri: result.default_image.thumbnail,
+                        //                 }}
+                        //                 style={{ width: 50, height: 50 }}
+                        //             />
+                        //         )}
+                        //     </TouchableOpacity>
+                        //     <TouchableOpacity>
+                        //         <Button
+                        //             title="+"
+                        //             onPress={() => {
+                        //                 addPlant(result);
+                        //             }}
+                        //         />
+                        //     </TouchableOpacity>
+                        // </>
                     );
                 })}
             </ScrollView>
@@ -197,10 +207,33 @@ const ListScreen = (props: any) => {
 export default ListScreen;
 
 const styles = StyleSheet.create({
-    input: {
-        height: 40,
-        margin: 12,
+    searchSection: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
+
+        height: 50,
+        marginTop: 30,
+        marginBottom: 30,
+        marginLeft: 10,
+        marginRight: 10,
+
         borderWidth: 1,
+        paddingLeft: 24,
+        paddingTop: 25,
+        paddingRight: 14,
+        paddingBottom: 25,
+        borderRadius: 20,
+        borderStyle: "solid",
+        borderColor: "#3A210E",
+    },
+    searchIcon: {
         padding: 10,
+    },
+    input: {
+        flex: 1,
+        height: 50,
     },
 });

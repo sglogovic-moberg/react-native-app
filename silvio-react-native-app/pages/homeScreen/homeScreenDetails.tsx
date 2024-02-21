@@ -3,9 +3,10 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { View, Text, Button, ScrollView, StyleSheet, Image } from "react-native";
 import { usePlantListStore } from "../../store/plantListStore";
-import { IPlantDetails, IPlantGuide } from "../../models/plantModels";
+import { IPlantDetails, IPlantGuide, SunlightOptionsEnum, WateringOptionsEnum } from "../../models/plantModels";
 import Spinner from "react-native-loading-spinner-overlay";
 import { apiKey } from "../../utils/constants";
+
 const HomeScreenDetails = (props: any) => {
     const addPlant = usePlantListStore(state => state.addPlant);
     const getPlantDetail = usePlantListStore(state => state.getPlantDetail);
@@ -57,36 +58,97 @@ const HomeScreenDetails = (props: any) => {
         return <Spinner visible={true} textContent={"Loading..."} />;
     }
 
+    const waterIcon =
+        plantDetails.watering && plantDetails.watering.toLowerCase() === WateringOptionsEnum.Frequent
+            ? require("../../components/icons/svgtopng/waterFrequentBig.png")
+            : plantDetails.watering.toLowerCase() === WateringOptionsEnum.Average
+            ? require("../../components/icons/svgtopng/waterAverageBig.png")
+            : require("../../components/icons/svgtopng/waterRareBig.png");
+
+    const sunIcon =
+        plantDetails.sunlight &&
+        plantDetails.sunlight.findIndex(value => value.toLowerCase() === SunlightOptionsEnum.FullSun) !== -1
+            ? require("../../components/icons/svgtopng/fullSunBig.png")
+            : plantDetails.sunlight.findIndex(value => value.toLowerCase() === SunlightOptionsEnum.PartShade) !== -1
+            ? require("../../components/icons/svgtopng/partShadeBig.png")
+            : require("../../components/icons/svgtopng/filteredSunBig.png");
+
     return (
         <ScrollView style={styles.container}>
             <Image
                 source={{
-                    uri: plantDetails?.default_image!.small_url,
+                    uri: plantDetails?.default_image!.regular_url,
                 }}
-                style={{ width: 200, height: 200 }}
+                style={{ width: "100%", height: 200 }}
             />
-            <Text style={styles.section}>{plantDetails.common_name}</Text>
-            <Text style={styles.section}>{plantDetails.description}</Text>
-            <Text style={styles.section}>{plantDetails.sunlight}</Text>
-            <Text style={styles.section}>{plantDetails.watering}</Text>
+            <View style={styles.content}>
+                <Text style={styles.title}>{plantDetails.common_name}</Text>
+                <View
+                    style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        alignContent: "center",
+                        gap: 10,
+                        alignItems: "center",
+                        padding: 14,
+                        paddingBottom: 0,
+                    }}
+                >
+                    <Image source={require("../../components/icons/svgtopng/sunBig.png")} />
+                    <Image source={sunIcon} />
+                </View>
+                <View
+                    style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 10,
+                        paddingBottom: 14,
+                        paddingLeft: 75,
+                    }}
+                >
+                    <Image source={require("../../components/icons/svgtopng/info.png")} />
+                    <Text style={{ fontSize: 12, opacity: 0.5 }}>Performs best in full sun to light shade</Text>
+                </View>
+                <View
+                    style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        alignContent: "center",
+                        gap: 10,
+                        alignItems: "center",
+                        padding: 14,
+                        paddingBottom: 0,
+                    }}
+                >
+                    <Image source={require("../../components/icons/svgtopng/dropletBig.png")} />
+                    <Image source={waterIcon} />
+                </View>
+                <View
+                    style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 10,
+                        paddingBottom: 14,
+                        paddingLeft: 75,
+                    }}
+                >
+                    <Image source={require("../../components/icons/svgtopng/info.png")} />
+                    <Text style={{ fontSize: 12, opacity: 0.5 }}>Highly drought tolerant once established</Text>
+                </View>
+                <Text style={styles.title}> About</Text>
+                <Text style={styles.textBlock}>{plantDetails.description}</Text>
 
-            <Text style={styles.section}>{JSON.stringify(plantGuide)}</Text>
-
-            {plantGuide?.section &&
-                plantGuide?.section.map((section: any, index: number) => (
-                    <Text key={index} style={styles.section}>
-                        {section.title}
-                        {section.description}
-                    </Text>
-                ))}
-
-            {/* {plantDetails.hardiness_location.full_iframe && (
-                <WebView
-                    source={{ html: plantDetails.hardiness_location.full_iframe }}
-                    style={{ marginTop: 20 }}
-                    androidHardwareAccelerationDisabled={true}
-                />
-            )} */}
+                <Text style={styles.title}> Guides</Text>
+                {plantGuide?.section &&
+                    plantGuide?.section.map((section: any, index: number) => (
+                        <>
+                            <Text style={styles.title2}>{section.type}</Text>
+                            <Text style={styles.textBlock}>{section.description}</Text>
+                        </>
+                    ))}
+            </View>
         </ScrollView>
     );
 };
@@ -94,7 +156,6 @@ const HomeScreenDetails = (props: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
         backgroundColor: "white",
         flexDirection: "column",
     },
@@ -107,6 +168,27 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "solid",
         marginVertical: 16,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: "bold",
+    },
+    title2: {
+        fontSize: 24,
+        fontWeight: "bold",
+        paddingLeft: 16,
+    },
+    content: {
+        flex: 1,
+        flexDirection: "column",
+        paddingLeft: 24,
+        paddingRight: 24,
+        paddingTop: 16,
+        paddingBottom: 16,
+    },
+    textBlock: {
+        fontSize: 14,
+        padding: 8,
     },
 });
 
