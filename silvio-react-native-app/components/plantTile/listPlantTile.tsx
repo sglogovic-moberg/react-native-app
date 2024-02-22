@@ -3,6 +3,7 @@ import { IBasePlant, SunlightOptionsEnum, WateringOptionsEnum } from "../../mode
 import { Button, TouchableOpacity, View, Text, Image, StyleSheet, Dimensions, Touchable } from "react-native";
 import { IWateredPlantInfo, usePlantListStore } from "../../store/plantListStore";
 import { DateTime } from "luxon";
+import Toast from "react-native-toast-message";
 
 export interface IListPlantTileProps {
     plant: IBasePlant;
@@ -11,7 +12,10 @@ export interface IListPlantTileProps {
 
 const ListPlantTile = (props: IListPlantTileProps) => {
     const addPlant = usePlantListStore(state => state.addPlant);
+    const deletePlant = usePlantListStore(state => state.deletePlant);
+    const myPlants = usePlantListStore(state => state.plants);
     const hasImage = props.plant.default_image?.small_url ? true : false;
+    const hasMyPlant = myPlants.findIndex(plant => plant.id === props.plant.id) !== -1;
 
     const waterIcon =
         props.plant.watering && props.plant.watering.toLowerCase() === WateringOptionsEnum.Frequent
@@ -21,12 +25,13 @@ const ListPlantTile = (props: IListPlantTileProps) => {
             : require("../icons/svgtopng/waterRare.png");
 
     const sunIcon =
-        props.plant.sunlight &&
-        props.plant.sunlight.findIndex(value => value.toLowerCase() === SunlightOptionsEnum.FullSun) !== -1
-            ? require("../icons/svgtopng/fullSun.png")
-            : props.plant.sunlight.findIndex(value => value.toLowerCase() === SunlightOptionsEnum.PartShade) !== -1
-            ? require("../icons/svgtopng/partShade.png")
-            : require("../icons/svgtopng/filteredSun.png");
+        props.plant.sunlight && props.plant.sunlight.length > 0 && Array.isArray(props.plant.sunlight)
+            ? props.plant.sunlight.findIndex(value => value.toLowerCase() === SunlightOptionsEnum.FullSun) !== -1
+                ? require("../icons/svgtopng/fullSun.png")
+                : props.plant.sunlight.findIndex(value => value.toLowerCase() === SunlightOptionsEnum.PartShade) !== -1
+                ? require("../icons/svgtopng/partShade.png")
+                : require("../icons/svgtopng/filteredSun.png")
+            : require("../icons/svgtopng/fullSun.png");
 
     return (
         <View style={{ flex: 1, flexDirection: "row" }}>
@@ -79,17 +84,40 @@ const ListPlantTile = (props: IListPlantTileProps) => {
                     </View>
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity
-                style={styles.action}
-                onPress={() => {
-                    // addPlant(result);
-                }}
-            >
-                <View style={styles.actionButton}>
-                    <Text style={styles.actionText}>Add</Text>
-                    <Image style={styles.icon} source={require("../icons/svgtopng/whitePlus.png")} />
-                </View>
-            </TouchableOpacity>
+            {hasMyPlant ? (
+                <TouchableOpacity
+                    style={styles.action}
+                    onPress={() => {
+                        deletePlant(props.plant.id);
+
+                        Toast.show({
+                            type: "error",
+                            text1: "Deleted plant 🌱",
+                        });
+                    }}
+                >
+                    <View style={styles.actionButton2}>
+                        <Text style={styles.actionText}>Delete</Text>
+                    </View>
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity
+                    style={styles.action}
+                    onPress={() => {
+                        addPlant(props.plant);
+
+                        Toast.show({
+                            type: "success",
+                            text1: "Added new plant 🌱",
+                        });
+                    }}
+                >
+                    <View style={styles.actionButton}>
+                        <Text style={styles.actionText}>Add</Text>
+                        <Image style={styles.icon} source={require("../icons/svgtopng/whitePlus.png")} />
+                    </View>
+                </TouchableOpacity>
+            )}
         </View>
     );
 };
@@ -147,6 +175,24 @@ const styles = StyleSheet.create({
         paddingLeft: 16,
         borderRadius: 12,
         backgroundColor: "#76BC65",
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    actionButton2: {
+        height: 120,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        gap: 8,
+        alignItems: "center",
+        paddingTop: 0,
+        paddingRight: 16,
+        paddingBottom: 0,
+        paddingLeft: 16,
+        borderRadius: 12,
+        backgroundColor: "#CC4444",
         shadowColor: "black",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,

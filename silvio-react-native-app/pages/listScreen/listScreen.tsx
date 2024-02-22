@@ -46,7 +46,6 @@ const ListScreen = (props: any) => {
         total: 0,
     });
     const [loading, setLoading] = React.useState(false);
-    const addPlant = usePlantListStore(state => state.addPlant);
 
     useEffect(() => {
         const getData = async () => {
@@ -99,10 +98,25 @@ const ListScreen = (props: any) => {
     );
 
     useEffect(() => {
-        if (text) {
-            if (text.length > 2) {
-                debouncedGetSearchResults(text);
-            }
+        if (text && text.length > 2) {
+            debouncedGetSearchResults(text);
+        } else if (text === "") {
+            const getData = async () => {
+                setLoading(true);
+                const result: any = await axios.get(`https://perenual.com/api/species-list?key=${apiKey}`);
+                setPageResult({
+                    to: result.data.to,
+                    per_page: result.data.per_page,
+                    current_page: result.data.current_page,
+                    from: result.data.from,
+                    last_page: result.data.last_page,
+                    total: result.data.total,
+                });
+                setResults(result.data.data);
+                setLoading(false);
+            };
+
+            getData();
         }
     }, [text]);
 
@@ -129,12 +143,14 @@ const ListScreen = (props: any) => {
         });
 
         setResults(results.concat(result.data.data));
-
-        console.log(results.concat(result.data.data).map((result: any) => result.common_name));
         setLoading(false);
     };
 
     const scrollNearBottom = async () => {
+        if (pageResult.current_page >= pageResult.last_page) {
+            return;
+        }
+
         debouncedGetMoreResults(pageResult.current_page + 1, text, results);
     };
 
@@ -162,44 +178,15 @@ const ListScreen = (props: any) => {
                 scrollEnabled={!loading}
                 // @ts-ignore
                 ref={scrollRef}
+                style={{ marginBottom: 120 }}
             >
                 {results.map((result: any, index) => {
-                    const hasImage = result.default_image?.thumbnail ? true : false;
-                    return (
-                        <ListPlantTile navigation={props.navigation} plant={result} />
-                        // <>
-                        //     <TouchableOpacity
-                        //         onPress={() => props.navigation.navigate("Details", { screen: "List", id: result.id })}
-                        //         key={result.id}
-                        //     >
-                        //         <Text>
-                        //             {result.common_name} - {result.cycle} - {result.watering} -{" "}
-                        //             {JSON.stringify(result.sunlight)}
-                        //         </Text>
-                        //         {hasImage && (
-                        //             <Image
-                        //                 source={{
-                        //                     uri: result.default_image.thumbnail,
-                        //                 }}
-                        //                 style={{ width: 50, height: 50 }}
-                        //             />
-                        //         )}
-                        //     </TouchableOpacity>
-                        //     <TouchableOpacity>
-                        //         <Button
-                        //             title="+"
-                        //             onPress={() => {
-                        //                 addPlant(result);
-                        //             }}
-                        //         />
-                        //     </TouchableOpacity>
-                        // </>
-                    );
+                    if (result === null || result === undefined) {
+                        return <></>;
+                    }
+                    return <ListPlantTile navigation={props.navigation} plant={result} key={result.id} />;
                 })}
             </ScrollView>
-            <View>
-                <Text></Text>
-            </View>
         </SafeAreaView>
     );
 };

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IBasePlant, IPlantDetails, IPlantGuide, WateringOptionsEnum } from "../models/plantModels";
+import * as Notifications from "expo-notifications";
 import { DateTime } from "luxon";
 
 export interface IWateredPlantInfo {
@@ -18,10 +19,11 @@ export interface IPlantListStore {
     waterPlant: (plantId: number) => void;
     plantDetailsCache: IPlantDetails[];
     addPlantDetailsCache: (data: IPlantDetails) => void;
-    plantGuidesCache: IPlantGuide[];
+    plantGuidesCache: IPlantGuide[] | [] | undefined;
     addPlantGuidesCache: (data: IPlantGuide) => void;
     getPlantDetail: (id: number) => IPlantDetails | undefined;
     getPlantGuide: (id: number) => IPlantGuide | undefined;
+    deletePlant: (id: number) => void;
 }
 
 export const usePlantListStore = create<IPlantListStore>()(
@@ -33,12 +35,12 @@ export const usePlantListStore = create<IPlantListStore>()(
             },
             getPlantGuide: id => {
                 const plantGuidesCache = get().plantGuidesCache;
-                return plantGuidesCache.find(p => p.id === id);
+                return plantGuidesCache!.find(p => p.id === id);
             },
             plantGuidesCache: [],
             addPlantGuidesCache: data => {
                 const plantGuidesCache = get().plantGuidesCache;
-                const newPlantGuidesCache = [...plantGuidesCache, data];
+                const newPlantGuidesCache = [...plantGuidesCache!, data];
                 set({ plantGuidesCache: newPlantGuidesCache });
             },
             plantDetailsCache: [],
@@ -53,7 +55,10 @@ export const usePlantListStore = create<IPlantListStore>()(
                 const newPlants = [...plants, data];
                 set({ plants: newPlants });
             },
-            clearPlants: () => set({ plants: new Array<IBasePlant>() }),
+            clearPlants: () => {
+                set({ plants: new Array<IBasePlant>() });
+                set({ wateredPlants: new Array<IWateredPlantInfo>() });
+            },
             wateredPlants: [],
             waterPlant: plantId => {
                 const plant = get().plants.find(p => p != null && p.id === plantId);
@@ -78,7 +83,22 @@ export const usePlantListStore = create<IPlantListStore>()(
                     };
 
                     set({ wateredPlants: [...get().wateredPlants, newWateredPlant] });
+
+                    Notifications.scheduleNotificationAsync({
+                        content: {
+                            title: "Plant watering reminder",
+                            body: "One of your plants needs watering! 💦",
+                        },
+                        trigger: {
+                            seconds: 5,
+                        },
+                    });
                 }
+            },
+            deletePlant: id => {
+                const plants = get().plants;
+                const newPlants = plants.filter(p => p.id !== id);
+                set({ plants: newPlants });
             },
         }),
         {

@@ -6,18 +6,39 @@ import BasePlantTile from "../../components/plantTile/basePlantTile";
 
 const gap = 12;
 
-const createRows = (data: any[], columns: number) => {
+const createRows = (data: any[], columns: number, wateredPlants: IWateredPlantInfo[]) => {
     let rows = [];
+
+    data.sort((a, b) => {
+        const firstPlantWatering = wateredPlants.find(
+            (wateredPlant: IWateredPlantInfo) => wateredPlant.plantId === a.id
+        );
+        const secondPlantWatering = wateredPlants.find(
+            (wateredPlant: IWateredPlantInfo) => wateredPlant.plantId === b.id
+        );
+        if (firstPlantWatering && secondPlantWatering) {
+            return firstPlantWatering.nextWatering > secondPlantWatering.nextWatering ? 1 : -1;
+        }
+        if (firstPlantWatering && !secondPlantWatering) {
+            return 1;
+        }
+        if (!firstPlantWatering && secondPlantWatering) {
+            return -1;
+        }
+
+        return 0;
+    });
+
     for (let i = 0; i < data.length; i += columns) {
         // Extract a slice of 'columns' items and add to the rows array
         rows.push(data.slice(i, i + columns));
     }
+
     return rows;
 };
 
 const HomeScreen = (props: any) => {
     const plants = usePlantListStore(state => state.plants);
-    const clearPlants = usePlantListStore(state => state.clearPlants);
     const wateredPlants = usePlantListStore(state => state.wateredPlants);
 
     const [displayText, setDisplayText] = useState(false);
@@ -26,7 +47,7 @@ const HomeScreen = (props: any) => {
         setDisplayText(!displayText);
     };
 
-    const rows = createRows(plants, 2);
+    const rows = createRows(plants, 2, wateredPlants);
 
     return (
         <View style={styles.container}>
@@ -64,7 +85,6 @@ const HomeScreen = (props: any) => {
                     </View>
                 </ImageBackground>
             </ScrollView>
-            {/* <Button title="Go to Details" onPress={() => clearPlants()} /> */}
         </View>
     );
 };
@@ -79,6 +99,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 0,
         bottom: "80%",
+        height: 220,
     },
     container: {
         flex: 1,

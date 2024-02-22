@@ -3,6 +3,7 @@ import { IBasePlant, SunlightOptionsEnum, WateringOptionsEnum } from "../../mode
 import { Button, TouchableOpacity, View, Text, Image, StyleSheet, Dimensions, Touchable } from "react-native";
 import { IWateredPlantInfo, usePlantListStore } from "../../store/plantListStore";
 import { DateTime } from "luxon";
+import Toast from "react-native-toast-message";
 
 export interface IBasePlantTileProps {
     plant: IBasePlant;
@@ -67,6 +68,11 @@ const BasePlantTile = (props: IBasePlantTileProps) => {
                 <TouchableOpacity
                     onPress={() => {
                         waterPlant(props.plant.id);
+
+                        Toast.show({
+                            type: "success",
+                            text1: "Plant watered 💧",
+                        });
                     }}
                     style={styles.waterButton}
                 >
@@ -114,6 +120,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "#000",
         paddingBottom: 8,
+        height: 40,
     },
     icons: {
         flex: 1,
@@ -127,8 +134,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     notWatered: {
+        padding: 8,
+        borderRadius: 8,
         fontSize: 12,
-        paddin: 8,
     },
     needsWatering: {
         backgroundColor: "#FF7373",
