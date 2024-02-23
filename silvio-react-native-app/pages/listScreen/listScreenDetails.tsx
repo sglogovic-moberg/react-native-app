@@ -159,14 +159,10 @@ const ListScreenDetails = (props: any) => {
                     <Text style={styles.title}> Guides</Text>
                     {plantGuide?.section &&
                         plantGuide?.section.map((section: any, index: number) => (
-                            <>
-                                <Text style={styles.title2} key={`${section.type}`}>
-                                    {section.type}
-                                </Text>
-                                <Text style={styles.textBlock} key={`${section.type}-description`}>
-                                    {section.description}
-                                </Text>
-                            </>
+                            <View key={`${section.type}`}>
+                                <Text style={styles.title2}>{section.type}</Text>
+                                <Text style={styles.textBlock}>{section.description}</Text>
+                            </View>
                         ))}
                 </View>
             </ScrollView>
