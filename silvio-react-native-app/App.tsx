@@ -13,7 +13,7 @@ export default function App() {
             <NavigationContainer>
                 <Tab.Navigator>
                     <Tab.Screen
-                        name="Home"
+                        name="Dashboard"
                         component={HomeScreenStack}
                         options={{
                             headerShown: false,
@@ -52,7 +52,7 @@ export default function App() {
                     />
                 </Tab.Navigator>
             </NavigationContainer>
-            <Toast />
+            <Toast position="bottom" />
         </>
     );
 }

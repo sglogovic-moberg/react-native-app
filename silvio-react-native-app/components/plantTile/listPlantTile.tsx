@@ -37,7 +37,7 @@ const ListPlantTile = (props: IListPlantTileProps) => {
         <View style={{ flex: 1, flexDirection: "row" }}>
             <View style={styles.container}>
                 <TouchableOpacity
-                    onPress={() => props.navigation.navigate("Details", { screen: "List", id: props.plant.id })}
+                    onPress={() => props.navigation.navigate("Plant Details", { screen: "List", id: props.plant.id })}
                     style={styles.touchable1}
                 >
                     {hasImage && (
@@ -52,7 +52,7 @@ const ListPlantTile = (props: IListPlantTileProps) => {
                     )}
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => props.navigation.navigate("Details", { screen: "List", id: props.plant.id })}
+                    onPress={() => props.navigation.navigate("Plant Details", { screen: "List", id: props.plant.id })}
                     style={styles.touchable2}
                 >
                     <View style={styles.content}>

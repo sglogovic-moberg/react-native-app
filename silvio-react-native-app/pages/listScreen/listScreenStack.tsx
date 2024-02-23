@@ -12,7 +12,7 @@ const ListScreenStack = () => {
         <ListStack.Navigator>
             <ListStack.Screen name="Plant list" component={ListScreen} />
             <ListStack.Screen
-                name="Details"
+                name="Plant Details"
                 component={ListScreenDetails}
                 options={{
                     headerRight: () => <Button title="Add" />,

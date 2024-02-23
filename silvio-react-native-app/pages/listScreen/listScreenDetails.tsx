@@ -43,7 +43,6 @@ const ListScreenDetails = (props: any) => {
 
     useEffect(() => {
         const getData = async () => {
-            setLoading(true);
             const detailsFromCache = getPlantDetail(id);
             const guideFromCache = getPlantGuide(id);
 
@@ -64,7 +63,6 @@ const ListScreenDetails = (props: any) => {
                 setPlantGuide(result.data.data[0]);
                 addPlantGuide(result.data.data[0]);
             }
-            setLoading(false);
         };
 
         getData();

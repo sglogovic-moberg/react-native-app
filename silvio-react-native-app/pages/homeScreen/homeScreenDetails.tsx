@@ -55,7 +55,6 @@ const HomeScreenDetails = (props: any) => {
 
     useEffect(() => {
         const getData = async () => {
-            setLoading(true);
             const detailsFromCache = getPlantDetail(id);
             const guideFromCache = getPlantGuide(id);
 
@@ -76,7 +75,6 @@ const HomeScreenDetails = (props: any) => {
                 setPlantGuide(result.data.data[0]);
                 addPlantGuide(result.data.data[0]);
             }
-            setLoading(false);
         };
 
         getData();
@@ -174,8 +172,12 @@ const HomeScreenDetails = (props: any) => {
                     {plantGuide?.section &&
                         plantGuide?.section.map((section: any, index: number) => (
                             <>
-                                <Text style={styles.title2}>{section.type}</Text>
-                                <Text style={styles.textBlock}>{section.description}</Text>
+                                <Text style={styles.title2} key={`${section.type}`}>
+                                    {section.type}
+                                </Text>
+                                <Text style={styles.textBlock} key={`${section.type}-description`}>
+                                    {section.description}
+                                </Text>
                             </>
                         ))}
                 </View>
